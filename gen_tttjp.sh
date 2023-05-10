@@ -1,18 +1,18 @@
 #!/usr/bin/bash
 
 OUTDIR=gen_tttjp
-exec >> ${OUTDIR}.log  2>&1
+#exec >> ${OUTDIR}.log  2>&1
 
 # need to specify python3.8 for CS8, while CS9 has python3.9 as default already
-PYTHON=python3.8
-
+PYTHON=python3
+MGpath="/atlas/data19/metsai/simulation/triple-top-nlo/MG5_aMC_v3_4_2"
 ### get MG 341
 #date
 #wget -O mg5.tar.gz https://launchpad.net/mg5amcnlo/3.0/3.4.x/+download/MG5_aMC_v3.4.1.tar.gz
 #MG="python3 `tar tzf mg5.tar.gz | grep mg5_aMC`"
 #tar xzf mg5.tar.gz
 
-MG="$PYTHON $HOME/tools/mg5amcnlo/bin/mg5_aMC"
+MG="$PYTHON $MGpath/bin/mg5_aMC"
 echo "--- Using MG executable: $MG"
 
 ### get lhapdf6
@@ -23,7 +23,7 @@ echo "--- Using MG executable: $MG"
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/`find ./ -type d -name "lhapdf6*"`/lib/
 
 # need to point to LHAPDF (required for systematics reweighting)
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/tools/mg5amcnlo/HEPTools/lhapdf6_py3/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MGpath/HEPTools/lhapdf6_py3/lib/
 echo "--- Using LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
 
 ### get model
@@ -79,7 +79,12 @@ PATCH="--- ${OUTDIR}/SubProcesses/P0_dbx_ttxtxu/matrix_2.f     2023-02-21 19:03:
 
 for FIXEDSCALE in False True ; do
 for ORDER in NLO LO ; do
+echo " "
+echo ">> Test with ORDER = " $ORDER "and FIXEDSCALE = " $FIXEDSCALE
+echo " " 
 
+echo "initialize and output produiction"
+echo "" 
 ### generate and apply patch
 echo "set auto_convert_model T          # convert model to python3 automatically
 import model ${MODEL}
@@ -95,7 +100,8 @@ if [[ ! -d "${OUTDIR}" ]] ; then
 	time patch -p0 <<< "$PATCH"
 fi
 
-
+echo "Launch produiction"
+echo "" 
 ### launch
 date
 echo "launch ${OUTDIR}
@@ -132,7 +138,8 @@ set store_rwgt_info True                 # needed for scale/pdf reweighting
 # set use_syst True                      # doesn't exist at NLO, the following is enough:
 set systematics_program systematics
 set systematics_arguments ['--mur=0.125,0.149,0.177,0.21,0.25,0.297,0.354,0.42,0.5,0.595,0.707,0.841,1,1.19,1.41,1.68,2,2.38,2.83,3.36,4,4.76,5.66,6.73,8', '--muf=0.125,0.149,0.177,0.21,0.25,0.297,0.354,0.42,0.5,0.595,0.707,0.841,1,1.19,1.41,1.68,2,2.38,2.83,3.36,4,4.76,5.66,6.73,8', '--pdf=errorset', '--together=mur,muf', '--dyn=-1']
-0" > ${OUTDIR}.cmd
+0
+exit" > ${OUTDIR}.cmd
 time $MG -f ${OUTDIR}.cmd
 
 date
