@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-OUTDIR=gen_tttjp
+#OUTDIR=gen_tttjp
 #exec >> ${OUTDIR}.log  2>&1
 
 # need to specify python3.8 for CS8, while CS9 has python3.9 as default already
@@ -29,6 +29,24 @@ echo "--- Using LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
 ### get model
 MODEL=loop_qcd_qed_sm                   # should automatically use 5FS
 
+for FIXEDSCALE in False True ; do
+for ORDER in NLO LO ; do
+
+#for FIXEDSCALE in False ; do
+#for ORDER in NLO ; do
+shower=OFF
+# OFF
+VERSION=v2_
+OUTDIR=$VERSION"gen_tttjp_Order"$ORDER"_FixScale"$FIXEDSCALE
+
+echo "===========================================" 
+echo "" 
+echo ""
+echo "Run with "$OUTDIR
+date
+echo ""                                                                                                                           
+echo ""  
+echo "==========================================="                                                                                
 
 ### get patch
 PATCH="--- ${OUTDIR}/SubProcesses/P0_dbx_ttxtxu/matrix_2.f     2023-02-21 19:03:36.000000001 +0100
@@ -77,8 +95,8 @@ PATCH="--- ${OUTDIR}/SubProcesses/P0_dbx_ttxtxu/matrix_2.f     2023-02-21 19:03:
        CALL FFV2_0(W(1,5),W(1,13),W(1,10),GC_124,AMP(3))"
 
 
-for FIXEDSCALE in False True ; do
-for ORDER in NLO LO ; do
+#for FIXEDSCALE in False True ; do
+#for ORDER in NLO LO ; do
 echo " "
 echo ">> Test with ORDER = " $ORDER "and FIXEDSCALE = " $FIXEDSCALE
 echo " " 
@@ -94,7 +112,7 @@ output ${OUTDIR}
 y# just in case some installation or overwritting is needed
 " > ${OUTDIR}.cmd
 if [[ ! -d "${OUTDIR}" ]] ; then
-	date
+	#date
 	echo "--- Generate, output and patch"
 	time $MG -f ${OUTDIR}.cmd
 	time patch -p0 <<< "$PATCH"
@@ -103,10 +121,10 @@ fi
 echo "Launch produiction"
 echo "" 
 ### launch
-date
+#date
 echo "launch ${OUTDIR}
 fixed_order=OFF
-shower=OFF
+shower=$shower
 order=$ORDER
 done
 set aEWM1 1.289300e+02
@@ -142,7 +160,17 @@ set systematics_arguments ['--mur=0.125,0.149,0.177,0.21,0.25,0.297,0.354,0.42,0
 exit" > ${OUTDIR}.cmd
 time $MG -f ${OUTDIR}.cmd
 
+#date 
+
+echo "==========================================="                                                                                
+echo ""                                                                                                                           
+echo ""                                                                                                                           
+echo "End of "$OUTDIR                                                                                                           
 date
+echo ""                                                                                                                           
+echo ""                                                                                                                           
+echo "==========================================="     
+
 
 done
 done
