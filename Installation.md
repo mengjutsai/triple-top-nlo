@@ -1,7 +1,7 @@
 # Installation tutorial
 
 ```
-git cloen git@github.com:mengjutsai/triple-top-nlo.git
+git clone git@github.com:mengjutsai/triple-top-nlo.git
 git checkout metsai
 ```
 
